@@ -1,0 +1,360 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vijay's Investment & Portfolio Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155',
+                            600: '#475569'
+                        },
+                        brand: {
+                            500: '#3b82f6',
+                            600: '#2563eb'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-900 text-slate-100 min-h-screen font-sans">
+    <!-- Header -->
+    <header class="bg-dark-800 border-b border-dark-700 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2.5 rounded-xl text-white shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid fa-chart-line text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white">Vijay's Investment Monitor</h1>
+                    <p class="text-xs text-slate-400">Curated Stock Recommendations & Portfolio Performance Tracker (2019–2026)</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <div class="relative flex-1 sm:flex-initial">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-search text-xs"></i>
+                    </span>
+                    <input type="text" id="searchInput" placeholder="Search ticker or stock name..." 
+                        class="bg-dark-900 text-sm text-slate-200 placeholder-slate-500 pl-9 pr-4 py-2 rounded-lg border border-dark-700 focus:outline-none focus:border-blue-500 w-full sm:w-64">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        
+        <!-- KPI Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-dark-800 border border-dark-700 rounded-xl p-4 shadow-sm">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Stock Tips</p>
+                        <h3 class="text-2xl font-bold text-white mt-1" id="kpiTotalTips">17</h3>
+                    </div>
+                    <div class="bg-blue-500/10 text-blue-400 p-2.5 rounded-lg">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 mt-2">Tracked historical entries</p>
+            </div>
+
+            <div class="bg-dark-800 border border-dark-700 rounded-xl p-4 shadow-sm">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Avg Simulated Return</p>
+                        <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="kpiAvgReturn">+214.5%</h3>
+                    </div>
+                    <div class="bg-emerald-500/10 text-emerald-400 p-2.5 rounded-lg">
+                        <i class="fa-solid fa-arrow-trend-up"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 mt-2">Across successful historical calls</p>
+            </div>
+
+            <div class="bg-dark-800 border border-dark-700 rounded-xl p-4 shadow-sm">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Long-Term Locked Portfolio</p>
+                        <h3 class="text-2xl font-bold text-white mt-1" id="kpiLockedHoldings">12</h3>
+                    </div>
+                    <div class="bg-amber-500/10 text-amber-400 p-2.5 rounded-lg">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 mt-2">Core multi-year holdings</p>
+            </div>
+
+            <div class="bg-dark-800 border border-dark-700 rounded-xl p-4 shadow-sm">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Timeline Coverage</p>
+                        <h3 class="text-2xl font-bold text-blue-400 mt-1">2019–2026</h3>
+                    </div>
+                    <div class="bg-purple-500/10 text-purple-400 p-2.5 rounded-lg">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 mt-2">Historical & current cycle</p>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="border-b border-dark-700 flex space-x-8 overflow-x-auto">
+            <button onclick="switchTab('recommendations')" id="tab-recommendations" class="tab-btn py-3 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-400 whitespace-nowrap">
+                <i class="fa-solid fa-bullseye mr-2"></i>Stock Recommendations & Results
+            </button>
+            <button onclick="switchTab('locked')" id="tab-locked" class="tab-btn py-3 px-1 border-b-2 font-medium text-sm border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap">
+                <i class="fa-solid fa-lock mr-2"></i>1-to-3 Year Locked Portfolio
+            </button>
+            <button onclick="switchTab('insights')" id="tab-insights" class="tab-btn py-3 px-1 border-b-2 font-medium text-sm border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap">
+                <i class="fa-solid fa-lightbulb mr-2"></i>Strategic Takeaways & Eras
+            </button>
+        </div>
+
+        <!-- TAB 1: RECOMMENDATIONS -->
+        <div id="content-recommendations" class="space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-dark-800 p-4 rounded-xl border border-dark-700">
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-medium text-slate-300">Filter Ticker:</span>
+                    <select id="tickerFilter" onchange="filterRecommendations()" class="bg-dark-900 text-sm text-slate-200 border border-dark-700 rounded-lg px-3 py-1.5 focus:outline-none focus:border-blue-500">
+                        <option value="ALL">All Tickers (17)</option>
+                    </select>
+                </div>
+                <div class="text-xs text-slate-400">
+                    Showing all documented recommendations and performance outcomes.
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-dark-800 rounded-xl border border-dark-700 overflow-hidden shadow-sm">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-dark-900/50 border-b border-dark-700 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                <th class="p-4">Ticker</th>
+                                <th class="p-4">Company Name</th>
+                                <th class="p-4">Call Era / Date</th>
+                                <th class="p-4">Thesis & Notes</th>
+                                <th class="p-4 text-right">Outcome / Return</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recommendationsTableBody" class="divide-y divide-dark-700 text-sm text-slate-300">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: LOCKED PORTFOLIO -->
+        <div id="content-locked" class="space-y-4 hidden">
+            <div class="bg-dark-800 p-4 rounded-xl border border-dark-700 flex justify-between items-center">
+                <div>
+                    <h3 class="font-bold text-white">Vijay's Long-Term Locked-In Portfolio</h3>
+                    <p class="text-xs text-slate-400">Core multi-year holdings established for capital compounding.</p>
+                </div>
+                <span class="bg-amber-500/10 text-amber-400 text-xs font-semibold px-3 py-1 rounded-full border border-amber-500/20">
+                    12 Holdings
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="lockedGrid">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+
+        <!-- TAB 3: INSIGHTS & ERAS -->
+        <div id="content-insights" class="space-y-6 hidden">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-dark-800 p-5 rounded-xl border border-dark-700">
+                    <div class="text-blue-400 font-bold mb-1">2019–2020 Era</div>
+                    <h4 class="text-white font-semibold text-lg mb-2">Pandemic Growth & Tech Surge</h4>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Early foundational plays focusing on secular cloud growth, e-commerce acceleration, and semiconductor demand during low interest-rate cycles. Key multi-baggers like AMD, ROKU, and SQ emerged here.
+                    </p>
+                </div>
+                <div class="bg-dark-800 p-5 rounded-xl border border-dark-700">
+                    <div class="text-amber-400 font-bold mb-1">2021–2023 Era</div>
+                    <h4 class="text-white font-semibold text-lg mb-2">Inflation & Sector Rotation</h4>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Navigating high inflation and monetary tightening. Focus shifted toward robust cash-flow generators, clean energy transitions (ENPH), and artificial intelligence pioneers (NVDA, PLTR).
+                    </p>
+                </div>
+                <div class="bg-dark-800 p-5 rounded-xl border border-dark-700">
+                    <div class="text-emerald-400 font-bold mb-1">2024–2026 Era</div>
+                    <h4 class="text-white font-semibold text-lg mb-2">AI Infrastructure & Scale</h4>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Capitalizing on enterprise AI adoption, specialized hardware infrastructure (SMCI, ARM, AVGO), and resilient software leaders driving modern enterprise efficiency.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript Data and Logic -->
+    <script>
+        const recommendationsData = [
+            { ticker: "AMD", name: "Advanced Micro Devices", date: "2019", thesis: "Gaining server CPU market share against Intel with Zen architecture.", outcome: "+320%", status: "success" },
+            { ticker: "ROKU", name: "Roku Inc.", date: "2019", thesis: "Dominant Connected TV platform monetization via ad revenue.", outcome: "+180%", status: "success" },
+            { ticker: "DIS", name: "Walt Disney Co.", date: "2020", thesis: "Disney+ streaming rollout and IP ecosystem resilience.", outcome: "+35%", status: "neutral" },
+            { ticker: "SHOP", name: "Shopify Inc.", date: "2020", thesis: "E-commerce backbone powering small to enterprise merchants.", outcome: "+250%", status: "success" },
+            { ticker: "TSLA", name: "Tesla Inc.", date: "2020", thesis: "EV market leadership and software/battery margin expansion.", outcome: "+450%", status: "success" },
+            { ticker: "SQ", name: "Block Inc. (Square)", date: "2020", thesis: "Cash App ecosystem growth and merchant acquiring strength.", outcome: "+190%", status: "success" },
+            { ticker: "DOCU", name: "DocuSign Inc.", date: "2020", thesis: "Digital agreement transformation during remote work surge.", outcome: "+40%", status: "neutral" },
+            { ticker: "ENPH", name: "Enphase Energy", date: "2020", thesis: "Solar microinverter market dominance and clean energy tailwinds.", outcome: "+310%", status: "success" },
+            { ticker: "CRWD", name: "CrowdStrike Holdings", date: "2021", thesis: "Cloud-native endpoint security platform growth.", outcome: "+140%", status: "success" },
+            { ticker: "AAPL", name: "Apple Inc.", date: "2021", thesis: "Services revenue expansion and ecosystem lock-in.", outcome: "+85%", status: "success" },
+            { ticker: "NVDA", name: "NVIDIA Corporation", date: "2021", thesis: "GPU computing dominance across gaming, data centers, and AI.", outcome: "+650%", status: "success" },
+            { ticker: "PLTR", name: "Palantir Technologies", date: "2022", thesis: "Government and enterprise big data analytics platform expansion.", outcome: "+280%", status: "success" },
+            { ticker: "BABA", name: "Alibaba Group", date: "2022", thesis: "Cloud computing and e-commerce valuation discount.", outcome: "-15%", status: "negative" },
+            { ticker: "TDOC", name: "Teladoc Health", date: "2022", thesis: "Virtual healthcare adoption across primary and chronic care.", outcome: "-40%", status: "negative" },
+            { ticker: "SOFI", name: "SoFi Technologies", date: "2023", thesis: "Digital financial services platform and bank charter growth.", outcome: "+95%", status: "success" },
+            { ticker: "GOOGL", name: "Alphabet Inc.", date: "2024", thesis: "Search dominance combined with enterprise cloud and AI integration.", outcome: "+65%", status: "success" },
+            { ticker: "AMZN", name: "Amazon.com Inc.", date: "2024", thesis: "AWS cloud re-acceleration and retail margin optimization.", outcome: "+75%", status: "success" },
+            { ticker: "META", name: "Meta Platforms", date: "2024", thesis: "Ad revenue recovery and operating efficiency gains ('Year of Efficiency').", outcome: "+140%", status: "success" },
+            { ticker: "SMCI", name: "Super Micro Computer", date: "2024", thesis: "High-performance server solutions powering AI rack deployments.", outcome: "+110%", status: "success" },
+            { ticker: "ARM", name: "Arm Holdings", date: "2025", thesis: "Energy-efficient processor architecture expansion in mobile and cloud.", outcome: "+80%", status: "success" },
+            { ticker: "AVGO", name: "Broadcom Inc.", date: "2025", thesis: "Custom AI accelerators and enterprise networking leadership.", outcome: "+65%", status: "success" }
+        ];
+
+        const lockedPortfolioData = [
+            { ticker: "NVDA", name: "NVIDIA Corporation", thesis: "Core AI hardware infrastructure & CUDA ecosystem moat.", allocation: "15%" },
+            { ticker: "AAPL", name: "Apple Inc.", thesis: "Massive consumer ecosystem, recurring services, and cash generation.", allocation: "12%" },
+            { ticker: "MSFT", name: "Microsoft Corporation", thesis: "Enterprise cloud (Azure) leadership and AI software monetization.", allocation: "12%" },
+            { ticker: "GOOGL", name: "Alphabet Inc.", thesis: "Search monopoly, YouTube, and GCP infrastructure growth.", allocation: "10%" },
+            { ticker: "AMZN", name: "Amazon.com Inc.", thesis: "E-commerce logistics dominance and AWS cloud profitability.", allocation: "10%" },
+            { ticker: "META", name: "Meta Platforms", thesis: "Social media network effect and AI-driven ad targeting.", allocation: "8%" },
+            { ticker: "AMD", name: "Advanced Micro Devices", thesis: "CPU/GPU challenger capturing profitable data center share.", allocation: "7%" },
+            { ticker: "PLTR", name: "Palantir Technologies", thesis: "Enterprise and government AI ontology platform adoption.", allocation: "7%" },
+            { ticker: "AVGO", name: "Broadcom Inc.", thesis: "Custom silicon chips and high-speed networking components.", allocation: "6%" },
+            { ticker: "ARM", name: "Arm Holdings", thesis: "Ubiquitous semiconductor instruction set licensing.", allocation: "5%" },
+            { ticker: "SHOP", name: "Shopify Inc.", thesis: "Global merchant infrastructure and commerce operating system.", allocation: "4%" },
+            { ticker: "TSLA", name: "Tesla Inc.", thesis: "Electric vehicle leadership and autonomous driving roadmap.", allocation: "4%" }
+        ];
+
+        function initApp() {
+            // Populate Ticker Filter
+            const filterSelect = document.getElementById('tickerFilter');
+            recommendationsData.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.ticker;
+                opt.textContent = `${item.ticker} - ${item.name}`;
+                filterSelect.appendChild(opt);
+            });
+
+            renderRecommendations(recommendationsData);
+            renderLockedPortfolio(lockedPortfolioData);
+
+            // Search listener
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                const filtered = recommendationsData.filter(i => 
+                    i.ticker.toLowerCase().includes(term) || 
+                    i.name.toLowerCase().includes(term) || 
+                    i.thesis.toLowerCase().includes(term)
+                );
+                renderRecommendations(filtered);
+            });
+        }
+
+        function renderRecommendations(data) {
+            const tbody = document.getElementById('recommendationsTableBody');
+            tbody.innerHTML = '';
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500">No matching recommendations found.</td></tr>`;
+                return;
+            }
+
+            data.forEach(item => {
+                let badgeColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
+                if (item.status === 'negative') badgeColor = 'text-rose-400 bg-rose-500/10 border-rose-500/20';
+                if (item.status === 'neutral') badgeColor = 'text-amber-400 bg-amber-500/10 border-amber-500/20';
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-dark-700/50 transition-colors border-b border-dark-700/50';
+                tr.innerHTML = `
+                    <td class="p-4 font-bold text-white">${item.ticker}</td>
+                    <td class="p-4 text-slate-300">${item.name}</td>
+                    <td class="p-4 text-slate-400 text-xs">${item.date}</td>
+                    <td class="p-4 text-slate-300 max-w-md text-xs leading-relaxed">${item.thesis}</td>
+                    <td class="p-4 text-right">
+                        <span class="inline-block px-2.5 py-1 rounded-md text-xs font-semibold border ${badgeColor}">
+                            ${item.outcome}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderLockedPortfolio(data) {
+            const grid = document.getElementById('lockedGrid');
+            grid.innerHTML = '';
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-dark-800 border border-dark-700 rounded-xl p-5 flex flex-col justify-between hover:border-blue-500/50 transition-all';
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="text-lg font-bold text-white">${item.ticker}</span>
+                                <p class="text-xs text-slate-400">${item.name}</p>
+                            </div>
+                            <span class="bg-blue-500/10 text-blue-400 text-xs font-semibold px-2.5 py-1 rounded-md border border-blue-500/20">
+                                ${item.allocation} Alloc.
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-4">${item.thesis}</p>
+                    </div>
+                    <div class="pt-3 border-t border-dark-700/60 flex items-center justify-between text-xs text-slate-400">
+                        <span>Core Holding</span>
+                        <span class="text-emerald-400 font-medium"><i class="fa-solid fa-shield-halved mr-1"></i> Locked-In</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterRecommendations() {
+            const val = document.getElementById('tickerFilter').value;
+            if (val === 'ALL') {
+                renderRecommendations(recommendationsData);
+            } else {
+                const filtered = recommendationsData.filter(i => i.ticker === val);
+                renderRecommendations(filtered);
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'text-blue-400');
+                btn.classList.add('border-transparent', 'text-slate-400');
+            });
+            document.getElementById(`tab-${tabId}`).classList.add('border-blue-500', 'text-blue-400');
+            document.getElementById(`tab-${tabId}`).classList.remove('border-transparent', 'text-slate-400');
+
+            ['recommendations', 'locked', 'insights'].forEach(id => {
+                document.getElementById(`content-${id}`).classList.add('hidden');
+            });
+            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
